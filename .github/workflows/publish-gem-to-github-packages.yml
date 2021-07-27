@@ -1,0 +1,21 @@
+name: Publish gem to GitHub Packages
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up GitHub private registry key
+        run: |
+          mkdir -p ~/.gem
+          touch ~/.gem/credentials
+          chmod 600 ~/.gem/credentials
+          echo ":github: Bearer ${{ secrets.GITHUB_TOKEN }}" >> ~/.gem/credentials
+      - name: Build and push gem
+        run: |
+          gem build learn_github_packages.gemspec
+          gem push --key github --host https://rubygems.pkg.github.com/kjirou ./learn_github_packages-*.gem
